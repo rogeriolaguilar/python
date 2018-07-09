@@ -22,10 +22,12 @@ def update_line(line):
 
     # Note that solution does not handle white space/comments after print statememt
     result = line
-    print_index = line.find(PRINT)
-    if print_index >= 0:
-        result = line.replace(PRINT, 'print(') + ')'
+    if(PRINT in line):
+        args_index = line.find(PRINT) + len(PRINT)
+        args = line[args_index:].lstrip()
         
+        result = "{}({})".format(line[:args_index], args)
+
     return result
 
 # Some simple tests
@@ -81,7 +83,7 @@ def update_file(input_file_name, output_file_name):
     
     # open file and read text in file as a string
     pass
-
+    
     # split text in <pre> blocks and update using update_pre_block()
 
     # Write the answer in the specified output file
