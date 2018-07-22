@@ -93,8 +93,22 @@ def multiline_diff(lines1, lines2):
 
       Returns (IDENTICAL, IDENTICAL) if the two lists are the same.
     """
-    return (IDENTICAL, IDENTICAL)
+    len1 = len(lines1)
+    len2 = len(lines2)
+    minor_len = len1 if len1 < len2 else len2
+    for line_number in range(0, minor_len):
+        idx = singleline_diff(lines1[line_number], lines2[line_number])
+        if idx != IDENTICAL:
+            return (line_number, idx)
+    
+    return (IDENTICAL, IDENTICAL) if len1 == len2 else (minor_len, 0)
 
+
+print(">>>> testing multiline_diff")
+test("identical lines:", multiline_diff(["aaa","bbb"], ["aaa","bbb"]), (IDENTICAL, IDENTICAL))
+test("different lines:", multiline_diff(["aaa","bbb"], ["aaa","bbab"]), (1, 2))
+test("more lines in lines1:", multiline_diff(["aaa","bbb"], ["aaa"]), (1,0))
+test("more lines in lines2:", multiline_diff(["aaa"], ["aaa","bbb"]), (1,0))
 
 def get_file_lines(filename):
     """
