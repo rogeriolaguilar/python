@@ -122,8 +122,16 @@ def get_file_lines(filename):
       If the file does not exist or is not readable, then the
       behavior of this function is undefined.
     """
-    return []
+    lines = []
+    file = open(filename, 'rt')
+    for line in file:
+        line = line.replace("\n", "")
+        line = line.replace("\r", "")
+        lines.append(line)
+    return lines
 
+
+print(get_file_lines('file.1.txt'))
 
 def file_diff_format(filename1, filename2):
     """
@@ -140,4 +148,24 @@ def file_diff_format(filename1, filename2):
       If either file does not exist or is not readable, then the
       behavior of this function is undefined.
     """
-    return ""
+    
+    lines1 = get_file_lines(filename1)
+    lines2 = get_file_lines(filename2)
+    line_number, idx = multiline_diff(lines1, lines2)
+    result = "No differences"
+    if line_number != IDENTICAL:
+        result = "Line {}:\n".format(line_number) + singleline_diff_format(lines1[line_number], lines2[line_number], idx)
+    return result
+
+
+print()
+print(">>>> testing file_diff_format")
+
+print("same file:")
+print(file_diff_format("file.1.txt","file.1.txt"))
+
+print()
+print(file_diff_format("file.1.txt","file.2.txt"))
+
+print()
+print(file_diff_format("file.2.txt","file.1.txt"))
