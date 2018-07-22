@@ -61,7 +61,24 @@ def singleline_diff_format(line1, line2, idx):
 
       If idx is not a valid index, then returns an empty string.
     """
-    return ""
+    compare_str = ''
+    line1_contain_return = ("\n" in line1 or "\r" in line1 )
+    line2_contain_return = ("\n" in line2 or "\r" in line2 )
+    invalid_idx = idx < 0
+
+    if line1_contain_return or line2_contain_return or invalid_idx:
+        return ""
+    else:
+        compare_str = '=' * idx + '^'
+        return line1 + '\n' + compare_str + '\n' + line2
+
+
+print(">>>> testing singleline_diff_format")
+print(singleline_diff_format("aaba", "aaaa", 2))
+print(singleline_diff_format("aaaaaaa", "aaaa", 4))
+print(singleline_diff_format("equal", "equal", -1))
+print(singleline_diff_format("equal\naaa", "equal", 4))
+print(singleline_diff_format("equalaaa", "equ\nal", 4))
 
 
 def multiline_diff(lines1, lines2):
