@@ -29,23 +29,6 @@ def singleline_diff(line1, line2):
 
     return IDENTICAL if len1 == len2 else minor_len
 
-
-
-## tests
-def test(message, result, expected_result):
-    success = "yes" if result == expected_result else "ERROR!"
-    print(message, "result:", result, "success?:", success)
-
-print(">>>> testing singleline_diff")
-test("identical lines:", singleline_diff("aaa", "aaa"), IDENTICAL)
-test("different lines:", singleline_diff("aba", "aaa"), 1)
-test("different first line is greater:", singleline_diff("abaaaa", "aaaa"), 1)
-test("different and second line is greater:", singleline_diff("012345", "01234?6"), 5)
-test("same chars but fisrt line is greater:", singleline_diff("012345", "0123456"), 6)
-test("same chars but second line is greater:", singleline_diff("01234567", "012345"), 6)
-
-
-
 def singleline_diff_format(line1, line2, idx):
     """
     Inputs:
@@ -61,25 +44,16 @@ def singleline_diff_format(line1, line2, idx):
 
       If idx is not a valid index, then returns an empty string.
     """
-    compare_str = ''
-    line1_contain_return = ("\n" in line1 or "\r" in line1 )
-    line2_contain_return = ("\n" in line2 or "\r" in line2 )
-    invalid_idx = idx < 0
+    compare_str = ""
+    line1_contains_return = ("\n" in line1 or "\r" in line1 )
+    line2_contains_return = ("\n" in line2 or "\r" in line2 )
+    invalid_idx = idx < 0 or idx > len(line1) or idx > len(line2)
 
-    if line1_contain_return or line2_contain_return or invalid_idx:
+    if line1_contains_return or line2_contains_return or invalid_idx:
         return ""
     else:
         compare_str = '=' * idx + '^'
-        return line1 + '\n' + compare_str + '\n' + line2
-
-
-print(">>>> testing singleline_diff_format")
-print(singleline_diff_format("aaba", "aaaa", 2))
-print(singleline_diff_format("aaaaaaa", "aaaa", 4))
-print(singleline_diff_format("equal", "equal", -1))
-print(singleline_diff_format("equal\naaa", "equal", 4))
-print(singleline_diff_format("equalaaa", "equ\nal", 4))
-
+        return line1 + '\n' + compare_str + '\n' + line2 + '\n'
 
 def multiline_diff(lines1, lines2):
     """
@@ -103,13 +77,6 @@ def multiline_diff(lines1, lines2):
     
     return (IDENTICAL, IDENTICAL) if len1 == len2 else (minor_len, 0)
 
-
-print(">>>> testing multiline_diff")
-test("identical lines:", multiline_diff(["aaa","bbb"], ["aaa","bbb"]), (IDENTICAL, IDENTICAL))
-test("different lines:", multiline_diff(["aaa","bbb"], ["aaa","bbab"]), (1, 2))
-test("more lines in lines1:", multiline_diff(["aaa","bbb"], ["aaa"]), (1,0))
-test("more lines in lines2:", multiline_diff(["aaa"], ["aaa","bbb"]), (1,0))
-
 def get_file_lines(filename):
     """
     Inputs:
@@ -130,9 +97,6 @@ def get_file_lines(filename):
         lines.append(line)
     return lines
 
-
-print(get_file_lines('file.1.txt'))
-
 def file_diff_format(filename1, filename2):
     """
     Inputs:
@@ -152,20 +116,49 @@ def file_diff_format(filename1, filename2):
     lines1 = get_file_lines(filename1)
     lines2 = get_file_lines(filename2)
     line_number, idx = multiline_diff(lines1, lines2)
-    result = "No differences"
+    result = "No differences\n"
     if line_number != IDENTICAL:
-        result = "Line {}:\n".format(line_number) + singleline_diff_format(lines1[line_number], lines2[line_number], idx)
+        line1 = lines1[line_number] if len(lines1) > line_number else ""
+        line2 = lines2[line_number] if len(lines2) > line_number else ""
+        result = "Line {}:\n".format(line_number) + singleline_diff_format(line1, line2, idx)
     return result
 
+# ## tests
+# def test(message, result, expected_result):
+#     success = "yes" if result == expected_result else "ERROR!"
+#     print(message, "result:", result, "success?:", success)
 
-print()
-print(">>>> testing file_diff_format")
+# print(">>>> testing singleline_diff")
+# test("identical lines:", singleline_diff("aaa", "aaa"), IDENTICAL)
+# test("different lines:", singleline_diff("aba", "aaa"), 1)
+# test("different first line is greater:", singleline_diff("abaaaa", "aaaa"), 1)
+# test("different and second line is greater:", singleline_diff("012345", "01234?6"), 5)
+# test("same chars but fisrt line is greater:", singleline_diff("012345", "0123456"), 6)
+# test("same chars but second line is greater:", singleline_diff("01234567", "012345"), 6)
 
-print("same file:")
-print(file_diff_format("file.1.txt","file.1.txt"))
+# print()
+# print(">>>> testing multiline_diff")
+# test("identical lines:", multiline_diff(["aaa","bbb"], ["aaa","bbb"]), (IDENTICAL, IDENTICAL))
+# test("different lines:", multiline_diff(["aaa","bbb"], ["aaa","bbab"]), (1, 2))
+# test("more lines in lines1:", multiline_diff(["aaa","bbb"], ["aaa"]), (1,0))
+# test("more lines in lines2:", multiline_diff(["aaa"], ["aaa","bbb"]), (1,0))
 
-print()
-print(file_diff_format("file.1.txt","file.2.txt"))
+# print()
+# print(">>>> testing singleline_diff_format")
+# print(singleline_diff_format("aaba", "aaaa", 2))
+# print(singleline_diff_format("aaaaaaa", "aaaa", 4))
+# print(singleline_diff_format("equal", "equal", -1))
+# print(singleline_diff_format("equal\naaa", "equal", 4))
+# print(singleline_diff_format("equalaaa", "equ\nal", 4))
 
-print()
-print(file_diff_format("file.2.txt","file.1.txt"))
+# print()
+# print(">>>> testing file_diff_format")
+
+# print("same file:")
+# print(file_diff_format("file.1.txt","file.1.txt"))
+
+# print()
+# print(file_diff_format("file.1.txt","file.2.txt"))
+
+# print()
+# print(file_diff_format("file.2.txt","file.1.txt"))
