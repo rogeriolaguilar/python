@@ -26,15 +26,9 @@ def read_csv_fieldnames(filename, separator, quote):
         reader = csv.DictReader(csvfile, dialect='new')
         return reader.fieldnames
 
-print("Testing", "read_csv_fieldnames")
-
-print('table1.csv', read_csv_fieldnames(BASE_DIR+'table1.csv', ',', None))
-print('table2.csv', read_csv_fieldnames(BASE_DIR+'table2.csv', ',', '"'))
-print('table3.csv', read_csv_fieldnames(BASE_DIR+'table3.csv', ',', "'"))
-print('table4.csv', read_csv_fieldnames(BASE_DIR+'table4.csv', ',', None))
-print('table5.csv', read_csv_fieldnames(BASE_DIR+'table5.csv', ',', '"'))
-print('table6.csv', read_csv_fieldnames(BASE_DIR+'table6.csv', ',', '"'))
-print('table7.csv', read_csv_fieldnames(BASE_DIR+'table7.csv', ',', '"'))
+# print("Testing", "read_csv_fieldnames")
+# print('table1.csv', read_csv_fieldnames(BASE_DIR+'table1.csv', ',', None))
+# print('table2.csv', read_csv_fieldnames(BASE_DIR+'table2.csv', ',', '"'))
 
 def read_csv_as_list_dict(filename, separator, quote):
     """
@@ -47,8 +41,16 @@ def read_csv_as_list_dict(filename, separator, quote):
       corresponds to a row in the CSV file.  The dictionaries in the
       list map the field names to the field values for that row.
     """
-    return []
+    dict_list = []
+    with open(filename,'rt', newline='') as csvfile:
+        csv.register_dialect('new', delimiter=separator, quotechar=quote)
+        reader = csv.DictReader(csvfile, dialect='new')
+        for row in reader:
+            dict_list.append(row)
 
+    return dict_list
+
+#print(read_csv_as_list_dict(BASE_DIR+'table1.csv', ',', None))
 
 def read_csv_as_nested_dict(filename, keyfield, separator, quote):
     """
@@ -63,7 +65,14 @@ def read_csv_as_nested_dict(filename, keyfield, separator, quote):
       CSV file.  The inner dictionaries map the field names to the
       field values for that row.
     """
-    return {}
+    table = {}
+    with open(filename) as csvfile:
+        csv.register_dialect('new', delimiter=separator, quotechar=quote)
+        reader = csv.DictReader(csvfile, dialect='new')
+        for row in reader:
+            table[row[keyfield]] = row
+ 
+    return table
 
 
 def write_csv_from_list_dict(filename, table, fieldnames, separator, quote):
@@ -79,4 +88,11 @@ def write_csv_from_list_dict(filename, table, fieldnames, separator, quote):
       given fieldnames.  The CSV file should use the given separator and
       quote characters.  All non-numeric fields will be quoted.
     """
-    pass
+    csv.register_dialect('new', delimiter=separator, quotechar=quote, quoting=csv.QUOTE_NONNUMERIC)
+    with open(filename, 'w', newline='') as csvfile:
+        writer = csv.DictWriter(csvfile, fieldnames=fieldnames, dialect='new')
+        writer.writeheader()
+
+        for row in table:
+            writer.writerow(row)
+    return
