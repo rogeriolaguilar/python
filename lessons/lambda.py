@@ -23,9 +23,15 @@ random.shuffle(l)
 print("Random list", l)
 
 
-rand_turples = list(map(lambda x: (x, random.randint(l[0], l[1])), l))
+rand_turples = list(map(lambda x: (x, random.randint(l[0], 99)), l))
 print("Random turples", rand_turples)
 
 
-l.sort()
-print("Re-sorted list", l)
+rand_turples.sort()
+print("Sorted tuples", rand_turples)
+
+rand_turples.sort(key = lambda x: x[1])
+print("Sorted tuples by second", rand_turples)
+
+rand_turples.sort(key = lambda t : t[0] * t[1])
+print("Sorted tuples by the product", rand_turples)
