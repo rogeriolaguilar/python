@@ -26,9 +26,9 @@ def read_csv_as_nested_dict(filename, keyfield, separator, quote):
     """
     table = {}
     with open(filename, newline='') as csvfile:
-      reader = csv.DictReader(csvfile, delimiter=separator, quotechar=quote)
-      for row in reader:
-          table[row[keyfield]] = row
+        reader = csv.DictReader(csvfile, delimiter=separator, quotechar=quote)
+        for row in reader:
+            table[row[keyfield]] = row
 
     return table
 
@@ -53,12 +53,11 @@ def build_plot_values(gdpinfo, gdpdata):
     min_year = gdpinfo["min_year"]
     max_year = gdpinfo["max_year"]
     result = []
-    
-    for k, v in gdpdata.items():
-      if k != '' and v != '' and min_year <= int(k) <= max_year:
-        result.append((int(k),float(v)))
-    return result
 
+    for key, value in gdpdata.items():
+        if key != '' and value != '' and key.isdigit() and min_year <= int(key) <= max_year:
+            result.append((int(key),float(value)))
+    return sorted(result)
 
 # gdpdata = {"1960":"42342", "1961": "", "1962": "3130", "1963": "13130" }
 # gdpinfo = {
@@ -71,6 +70,7 @@ def build_plot_values(gdpinfo, gdpdata):
 #     "country_code": "Country Code"
 # }
 # result = build_plot_values(gdpinfo, gdpdata)
+# print(result)
 
 def build_plot_dict(gdpinfo, country_list):
     """
@@ -88,15 +88,17 @@ def build_plot_dict(gdpinfo, country_list):
       with an empty XY plot value list.
     """
     result = {}
-    filedata = read_csv_as_nested_dict(gdpinfo['gdpfile'], gdpinfo["country_name"], gdpinfo["separator"], gdpinfo["quote"])
+    filename = gdpinfo['gdpfile']
+    country = gdpinfo["country_name"]
+    separator = gdpinfo["separator"]
+    quote = gdpinfo["quote"]
+    filedata = read_csv_as_nested_dict(filename, country, separator, quote)
     for country in country_list:
-      country_data = filedata.get(country)
-      if country_data == None:
-        result[country] = []
-      else:
-        has_number_key = lambda dic: dic[0].isdigit()
-        gdp_by_year = { k : v for k,v in filter(has_number_key , country_data.items()) }
-        result[country] = build_plot_values(gdpinfo, gdp_by_year)
+        country_data = filedata.get(country)
+        if country_data is None:
+            result[country] = []
+        else:
+            result[country] = sorted(build_plot_values(gdpinfo, country_data))
 
     return result
 
@@ -132,7 +134,7 @@ def render_xy_plot(gdpinfo, country_list, plot_file):
     xy_chart = pygal.XY()
     xy_chart.title = 'GDP data'
     for country in country_list:
-      xy_chart.add(country, plot_dict[country])    
+        xy_chart.add(country, plot_dict[country])    
     
     xy_chart.render_to_file(plot_file)
     return
@@ -166,11 +168,9 @@ def test_render_xy_plot():
 
     render_xy_plot(gdpinfo, [], "isp_gdp_xy_none.svg")
     render_xy_plot(gdpinfo, ["China"], "isp_gdp_xy_china.svg")
-    render_xy_plot(gdpinfo, ["United Kingdom", "United States"],
-                   "isp_gdp_xy_uk+usa.svg")
+    render_xy_plot(gdpinfo, ["United Kingdom", "United States"], "isp_gdp_xy_uk+usa.svg")
 
 
 # Make sure the following call to test_render_xy_plot is commented out
 # when submitting to OwlTest/CourseraTest.
-
-test_render_xy_plot()
+# test_render_xy_plot()
