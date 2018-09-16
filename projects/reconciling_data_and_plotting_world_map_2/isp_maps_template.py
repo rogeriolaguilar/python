@@ -42,6 +42,18 @@ def build_country_code_converter(codeinfo):
       are world bank country codes, where the code fields in the
       code file are specified in codeinfo.
     """
+    filename = codeinfo['codefile']
+    keyfield = codeinfo['plot_codes']
+    separator = codeinfo['separator']
+    quote = codeinfo['quote']
+    
+    nested_dict = read_csv_as_nested_dict(filename, keyfield, separator, quote)
+    
+    code_mapper = {}
+    for plot_codes, csv_dict in nested_dict.items():
+        code_mapper[plot_codes] = csv_dict[codeinfo['data_codes']]
+
+    return code_mapper
 
 def reconcile_countries_by_code(codeinfo, plot_countries, gdp_countries):
     """
